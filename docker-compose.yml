@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  bot_db:
+    container_name: "DATABASE_CONTAINER_NAME"
+    restart: always
+    image: postgres:12.20-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: USERNAME  # as DB_USER in credentials.py
+      POSTGRES_PASSWORD: PASSWORD  # as DB_PASSWORD
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./new_database.sql:/docker-entrypoint-initdb.d/new_database.sql
+    ports:
+      - 5432:5432  # optional, second number must be same as DB_PORT in credentials.py
+
+  bot:
+    container_name: "BOT_CONTAINER_NAME"
+    restart: always
+    image: BOT-IMAGE-NAME:latest
+
+volumes:
+  pgdata:
+    external: true
