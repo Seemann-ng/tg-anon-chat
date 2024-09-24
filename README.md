@@ -43,3 +43,24 @@ in the `docker-compose.yml` file.__
     
 ----
 
+## 📠 Interaction with the bot: 📠
+
+### ⌨️ _Commands:_ ⌨️
+
+`/start` __- sends a welcome message to User and sets them new token.__
+ 
+`/new_token` __- sets new token for User.__
+
+`/my_token` __- sends User message with their token.__
+
+`/set_recipient` __- sends User request for new Recipient's token. Replying to one sets new Recipient.__
+  
+__⚠️ Bot only recognizes digits in the reply message.__
+
+`/delete_recipient` __- changes Recipient's token to null value, so messages aren't forwarded to any recipient.__
+
+`/get_recipient` __- sends User message with current Recipient's token.__
+
+`/random_recipient` __- connects User to random Recipient from the database.__
+
+__✉️ Once new User gets their User token and sets a known to them or random Recipient's token, every text message sent to the bot is being re-sent to corresponding Recipient only revealing User's token.__
