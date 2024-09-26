@@ -76,14 +76,14 @@ def set_recipient(message: types.Message) -> None:
     logging.info("set_recipient() enter.")
     bot.send_message(
         message.from_user.id,
-        "Please enter new Recipient's token.",
+        "Please, enter new Recipient's token.",
         reply_markup=types.ForceReply(input_field_placeholder="Recipient's token")
     )
     logging.info("set_recipient() done.")
 
 
 @bot.message_handler(
-    func=lambda m: m.reply_to_message and m.reply_to_message.text == "Please enter new recipient token."
+    func=lambda m: m.reply_to_message and m.reply_to_message.text == "Please, enter new Recipient's token."
 )
 def new_recipient(message: types.Message) -> None:
     """Set new Recipient's token from User's input.
