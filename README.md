@@ -1,66 +1,66 @@
-# 📠 'Telegraph' Telegram bot 📠
+# 📠 'Telegraph' Telegram bot
 
 ![image](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
 ![image](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
 ![image](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 ![image](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-#### _Token-based Telegram bot to anonymously chat with each other._
+Token-based Telegram bot to anonymously chat with each other.
 
-> ___Bot is available on https://t.me/Seemann_ng_anonchat_bot___
+Bot is available on https://t.me/Seemann_ng_anonchat_bot
 
-----
+## 💾 Build and run:
 
-## 💾 Deployment: 💾
+Run the following command to start the bot:
 
-- __Insert Your database container name, postgres username and password in the corresponding fields:\
-`container_name`, `POSTGRES_USER` and `POSTGRES_PASSWORD` of the `bot_db` service in the `docker-compose.yml` file.__
+```bash
+docker compose up -d --build
+```
 
-  - ___Optionally You can change port settings in the `ports` field.___
-  
-    ⚠️ _Note: the port after ':' symbol must be same as in `credentials.py`._
-  
-- __Insert Your bot container name and bot image name in the `container_name` and `image` fields of the `bot` service\
-in the `docker-compose.yml` file.__
+## 🔐 Environment:
 
-- __Insert Your bot token into field `"BOT_TOKEN"` in `credentials.py`.__
+In the `.env` file, or through the `-e` flags, you must set the required variables from
+tables below.
 
-- __Fill `DB_USER`, `DB_PASSWORD` (and `DB_PORT` if changed) fields as per `docker-compose.yml`.__
+| Variable       | Default         | Description                                  |
+|----------------|-----------------|----------------------------------------------|
+| `BOT_TOKEN`    | **(required)**  | Telegram bot token                           | 
+| `DB_USER`      | **(required)**  | DB User name                                 |
+| `DB_PASSWORD`  | **(required)**  | DB User password                             |
+| `DB_EXT_PORT`  | **(required)**  | External DB host port, `5432` is recommended |
 
-- __Run `Docker Engine`.__
 
-- __Execute the following commands from the project directory:__
+## 📠 Interaction with the bot:
 
-  - ```bash
-    docker image build . -t BOT-IMAGE-NAME
-    ```
-  
-  ⚠️ ___`BOT-IMAGE-NAME` must be as per `docker-compose.yml`.___
+### ⌨️ _Commands:_
 
-  - ```bash
-    docker compose -f docker-compose.yml up -d --force-recreate
-    ```
-    
-----
-
-## 📠 Interaction with the bot: 📠
-
-### ⌨️ _Commands:_ ⌨️
-
-`/start` __- sends a welcome message to User and sets them new token.__
+`/start` - sends a welcome message to User and sets them new token.
  
-`/new_token` __- sets new token for User.__
+`/new_token` - sets new token for User.
 
-`/my_token` __- sends User message with their token.__
+`/my_token` - sends User message with their token.
 
-`/set_recipient` __- sends User request for new Recipient's token. Replying to one sets new Recipient.__
+`/set_recipient` - sends User request for new Recipient's token. Replying to one sets new Recipient.
   
 __⚠️ Bot only recognizes digits in the reply message.__
 
-`/delete_recipient` __- changes Recipient's token to null value, so messages aren't forwarded to any recipient.__
+`/delete_recipient` - changes Recipient's token to null value, so messages aren't forwarded to any recipient.
 
-`/get_recipient` __- sends User message with current Recipient's token.__
+`/get_recipient` - sends User message with current Recipient's token.
 
-`/random_recipient` __- connects User to random Recipient from the database.__
+`/random_recipient` - connects User to random Recipient from the database.
 
 __✉️ Once new User gets their User token and sets a known to them or random Recipient's token, every text message sent to the bot is being re-sent to corresponding Recipient only revealing User's token.__
+
+## 👨‍🔧Built with:
+
+* [Python 3.12](https://www.python.org/) - programming language
+* [PyCharm](https://www.jetbrains.com/pycharm/) - IDE from JetBrains
+
+## 👨‍💻 Author:
+
+* **Ilia Tashkenov (_セーラー_)** - [Seemann-ng](https://github.com/Seemann-ng), 2024
+
+## 📝 License:
+
+This project is licensed under the MIT License - see the [license website](https://opensource.org/licenses/MIT) for details

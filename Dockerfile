@@ -4,11 +4,9 @@ LABEL authors="Seemann-ng"
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install -r /app/requirements.txt
 
-COPY credentials.py /app/credentials.py
-COPY bot /app/bot
-COPY dbtokenshandler /app/dbtokenshandler
+COPY bot /app
 
-WORKDIR /app/bot
+WORKDIR /app
 
 ENV PYTHONPATH="${PYTHONPATH}:/app"
 ENV PYTHONUNBUFFERED=1

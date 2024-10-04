@@ -1,22 +1,21 @@
-import logging
-
 import telebot
 import telebot.types as types
+from environs import Env
 
-import credentials
-from dbtokenshandler import DBTokensHandler as TokenHandler
+import messages
+from handlers import DBTokensHandler
+from tools import logger, logger_decorator
 
-bot = telebot.TeleBot(token=credentials.BOT_TOKEN)
+env = Env()
+env.read_env()
 
-logging.basicConfig(
-    filename="log.txt",
-    filemode="a",
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
+BOT_TOKEN = env.str("BOT_TOKEN")
+
+bot = telebot.TeleBot(token=BOT_TOKEN)
 
 
 @bot.message_handler(commands=["start"])
+@logger_decorator
 def start(message: types.Message) -> None:
     """Send welcome message to User, set new User token.
 
@@ -24,13 +23,12 @@ def start(message: types.Message) -> None:
         message: /start command form User.
 
     """
-    logging.info("start() enter.")
-    bot.send_message(message.from_user.id, "Hello! Welcome to my chatbot!")
+    bot.send_message(message.from_user.id, messages.WELCOME_MSG)
     set_new_token(message)
-    logging.info("start() done.")
 
 
 @bot.message_handler(commands=["new_token"])
+@logger_decorator
 def set_new_token(message: types.Message) -> None:
     """Set new token for User.
 
@@ -38,16 +36,13 @@ def set_new_token(message: types.Message) -> None:
         message: /new_token command from User.
 
     """
-    logging.info("set_new_token() enter.")
-    if not TokenHandler.get_my_token(message):
-        user_token = TokenHandler.set_my_token(message)
-    else:
-        user_token = TokenHandler.update_my_token(message)
-    bot.send_message(message.from_user.id, f"Your new user token: {user_token}")
-    logging.info("set_new_token() done.")
+    user_token = DBTokensHandler.update_me(message) if DBTokensHandler.get_me(message)\
+        else DBTokensHandler.set_me(message)
+    bot.send_message(message.from_user.id, messages.MY_NEW_TOKEN_SET_MSG(user_token))
 
 
 @bot.message_handler(commands=["my_token"])
+@logger_decorator
 def my_token(message: types.Message) -> None:
     """Tell User their token.
 
@@ -55,17 +50,15 @@ def my_token(message: types.Message) -> None:
         message: /my_token command from User.
 
     """
-    logging.info("my_token() enter.")
-    user_token = TokenHandler.get_my_token(message)
+    user_token = DBTokensHandler.get_me(message)
     if user_token:
-        bot.send_message(message.from_user.id, f"Your token: {user_token}")
-        logging.info("my_token() done (200).")
+        bot.send_message(message.from_user.id, messages.MY_TOKEN_MSG(user_token))
     else:
-        bot.send_message(message.from_user.id, "Token was not found.")
-        logging.info("my_token() done (404).")
+        bot.send_message(message.from_user.id, messages.MY_TOKEN_NOT_FOUND_MSG)
 
 
 @bot.message_handler(commands=["set_recipient"])
+@logger_decorator
 def set_recipient(message: types.Message) -> None:
     """Send new Recipient's token request to User.
 
@@ -73,18 +66,14 @@ def set_recipient(message: types.Message) -> None:
         message: /set_recipient command from User.
 
     """
-    logging.info("set_recipient() enter.")
-    bot.send_message(
-        message.from_user.id,
-        "Please, enter new Recipient's token.",
-        reply_markup=types.ForceReply(input_field_placeholder="Recipient's token")
-    )
-    logging.info("set_recipient() done.")
+    bot.send_message(message.from_user.id,
+                     messages.SET_RECIPIENT_MSG,
+                     reply_markup=types.ForceReply(input_field_placeholder=messages.SET_RECIPIENT_PLACEHOLDER))
 
 
-@bot.message_handler(
-    func=lambda m: m.reply_to_message and m.reply_to_message.text == "Please, enter new Recipient's token."
-)
+@bot.message_handler(func=lambda message: message.reply_to_message\
+                                          and message.reply_to_message.text == messages.SET_RECIPIENT_MSG)
+@logger_decorator
 def new_recipient(message: types.Message) -> None:
     """Set new Recipient's token from User's input.
 
@@ -92,13 +81,12 @@ def new_recipient(message: types.Message) -> None:
         message: Text message with new Recipient's token.
 
     """
-    logging.info("new_recipient() enter.")
-    recipient_token = TokenHandler.set_recipient_token(message)
-    bot.send_message(message.from_user.id, f"Your recipient is now: {recipient_token}.")
-    logging.info("new_recipient() done.")
+    recipient_token = DBTokensHandler.set_recipient(message)
+    bot.send_message(message.from_user.id, messages.NEW_RECIPIENT_MSG(recipient_token))
 
 
 @bot.message_handler(commands=["delete_recipient"])
+@logger_decorator
 def delete_recipient(message: types.Message) -> None:
     """Set current Recipient's token to null.
 
@@ -106,13 +94,12 @@ def delete_recipient(message: types.Message) -> None:
         message: /delete_recipient command from User.
 
     """
-    logging.info("delete_recipient() enter.")
-    TokenHandler.delete_recipient_token(message)
-    bot.send_message(message.from_user.id, "Your recipient was set to null.")
-    logging.info("delete_recipient() done.")
+    DBTokensHandler.delete_recipient(message)
+    bot.send_message(message.from_user.id, messages.RECIPIENT_DELETE_MSG)
 
 
 @bot.message_handler(commands=["get_recipient"])
+@logger_decorator
 def get_recipient(message: types.Message) -> None:
     """Tell User current Recipient's token.
 
@@ -120,13 +107,12 @@ def get_recipient(message: types.Message) -> None:
         message: /get_recipient command from User.
 
     """
-    logging.info("get_recipient() enter.")
-    current_recipient = TokenHandler.get_recipient_token(message)
-    bot.send_message(message.from_user.id, f"Your recipient is: {current_recipient}.")
-    logging.info("get_recipient() done.")
+    current_recipient = DBTokensHandler.get_recipient(message)
+    bot.send_message(message.from_user.id, messages.GET_RECIPIENT_MSG(current_recipient))
 
 
 @bot.message_handler(commands=["random_recipient"])
+@logger_decorator
 def random_recipient(message: types.Message) -> None:
     """Set a random Recipient from existing in the DB.
 
@@ -134,13 +120,12 @@ def random_recipient(message: types.Message) -> None:
         message: /random_recipient command from User.
 
     """
-    logging.info("random_recipient() enter.")
-    recipient_token = TokenHandler.set_random_recipient_token(message)
-    bot.send_message(message.from_user.id, f"Your recipient is now: {recipient_token}.")
-    logging.info("random_recipient() done.")
+    recipient_token = DBTokensHandler.set_random_recipient(message)
+    bot.send_message(message.from_user.id, messages.NEW_RECIPIENT_MSG(recipient_token))
 
 
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: not message.reply_to_message)
+@logger_decorator
 def send_message(message: types.Message) -> None:
     """Send anonymous text message to chosen Recipient. Tell User weather the message has been sent or not.
 
@@ -148,24 +133,18 @@ def send_message(message: types.Message) -> None:
         message: Text message from User.
 
     """
-    logging.info("send_message() enter.")
-    recipient_id = TokenHandler.get_recipient_id(message)
-    recipient_token = TokenHandler.get_recipient_token(message)
-    sender_token = TokenHandler.get_my_token(message)
+    recipient_id = DBTokensHandler.get_recipient_id(message)
+    recipient_token = DBTokensHandler.get_recipient(message)
+    sender_token = DBTokensHandler.get_me(message)
     if recipient_id:
-        bot.send_message(recipient_id, f"Incoming message from {sender_token}:\n{message.text}")
-        bot.send_message(message.from_user.id, f"Your message has been sent to {recipient_token}.")
-        logging.info("send_message() done (sent).")
+        bot.send_message(recipient_id, messages.INCOMING_MESSAGE_MSG(sender_token, message.text))
+        bot.send_message(message.from_user.id, messages.MESSAGE_SENT_MSG(recipient_token))
     else:
-        bot.send_message(
-            message.from_user.id,
-            f"Recipient {recipient_token} was not found.\nYour message has NOT been sent."
-        )
-        logging.info("send_message() done (NOT sent).")
+        bot.send_message(message.from_user.id, messages.RECIPIENT_NOT_FOUND_MSG(recipient_token))
 
 
 def main():
-    logging.info("Bot is running.")
+    logger.info("Bot is running.")
     bot.infinity_polling()
 
 
