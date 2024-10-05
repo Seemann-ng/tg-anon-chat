@@ -7,7 +7,7 @@
 
 Token-based Telegram bot to anonymously chat with each other.
 
-Bot is available [here](https://t.me/Seemann_ng_anonchat_bot)
+Bot is available [here](https://t.me/Seemann_ng_anonchat_bot).
 
 ## 💾 Build and run:
 
@@ -22,12 +22,12 @@ docker compose up -d --build
 In the `.env` file, or through the `-e` flags, you must set the required variables from
 tables below.
 
-| Variable       | Default         | Description                                  |
-|----------------|-----------------|----------------------------------------------|
-| `BOT_TOKEN`    | **(required)**  | Telegram bot token                           | 
-| `DB_USER`      | **(required)**  | DB User name                                 |
-| `DB_PASSWORD`  | **(required)**  | DB User password                             |
-| `DB_EXT_PORT`  | **(required)**  | External DB host port, `5432` is recommended |
+| Variable       | Default         | Description                                   |
+|----------------|-----------------|-----------------------------------------------|
+| `BOT_TOKEN`    | **(required)**  | Telegram bot token.                           | 
+| `DB_USER`      | **(required)**  | DB User name.                                 |
+| `DB_PASSWORD`  | **(required)**  | DB User password.                             |
+| `DB_EXT_PORT`  | **(required)**  | External DB host port, `5432` is recommended. |
 
 
 ## 📠 Interaction with the bot:
@@ -63,4 +63,4 @@ __✉️ Once new User gets their User token and sets a known to them or random 
 
 ## 📝 License:
 
-This project is licensed under the MIT License - see the [license website](https://opensource.org/licenses/MIT) for details
+This project is licensed under the MIT License - see the [license website](https://opensource.org/licenses/MIT) for details.
