@@ -59,7 +59,7 @@ __✉️ Once new User gets their User token and sets a known to them or random 
 
 ## 👨‍💻 Author:
 
-* **Ilia Tashkenov (_セーラー_)** - [Seemann-ng](https://github.com/Seemann-ng), 2024
+* **Ilia Tashkenov (_セーラー_)** - [Seemann-ng](https://github.com/Seemann-ng), 2024.
 
 ## 📝 License:
 
