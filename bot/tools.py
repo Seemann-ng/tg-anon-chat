@@ -8,12 +8,12 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-logger = logging.getLogger("Telegraph Chat")
+logger_obj = logging.getLogger("Telegraph Chat")
 
 
-def logger_decorator(func):
+def logger(func):
     @functools.wraps(func)
     def wrapper(message: types.Message, *args, **kwargs):
-        logger.info(f"{func.__name__} called by user {message.from_user.username} with message {message.text}")
+        logger_obj.info(f"{func.__name__} called by user {message.from_user.username} with message {message.text}")
         return func(message, *args, **kwargs)
     return wrapper

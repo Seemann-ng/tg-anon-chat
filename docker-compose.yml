@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  telegraph_bot_db:
+  database:
     container_name: "ilia_telegraph_bot_db"
     restart: always
     image: postgres:12.20-alpine
@@ -17,7 +17,7 @@ services:
     ports:
       - ${DB_EXT_PORT}:5432
 
-  telegraph_bot:
+  bot:
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,7 +25,6 @@ services:
       - .env
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
-    image: ilia-telegraph-bot:latest
     container_name: "ilia_telegraph_bot"
     restart: always
 

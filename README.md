@@ -1,4 +1,4 @@
-# 📠 'Telegraph' Telegram bot
+# 📠 Telegraph Telegram bot
 
 ![image](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
 ![image](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
@@ -7,7 +7,7 @@
 
 Token-based Telegram bot to anonymously chat with each other.
 
-Bot is available on https://t.me/Seemann_ng_anonchat_bot
+Bot is available [here](https://t.me/Seemann_ng_anonchat_bot)
 
 ## 💾 Build and run:
 
@@ -54,8 +54,8 @@ __✉️ Once new User gets their User token and sets a known to them or random 
 
 ## 👨‍🔧Built with:
 
-* [Python 3.12](https://www.python.org/) - programming language
-* [PyCharm](https://www.jetbrains.com/pycharm/) - IDE from JetBrains
+* [Python 3.12](https://www.python.org/) - programming language.
+* [PyCharm](https://www.jetbrains.com/pycharm/) - IDE from JetBrains.
 
 ## 👨‍💻 Author:
 

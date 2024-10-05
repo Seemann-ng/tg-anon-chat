@@ -4,7 +4,7 @@ from environs import Env
 
 import messages
 from handlers import DBTokensHandler
-from tools import logger, logger_decorator
+from tools import logger, logger_obj
 
 env = Env()
 env.read_env()
@@ -15,7 +15,7 @@ bot = telebot.TeleBot(token=BOT_TOKEN)
 
 
 @bot.message_handler(commands=["start"])
-@logger_decorator
+@logger
 def start(message: types.Message) -> None:
     """Send welcome message to User, set new User token.
 
@@ -28,7 +28,7 @@ def start(message: types.Message) -> None:
 
 
 @bot.message_handler(commands=["new_token"])
-@logger_decorator
+@logger
 def set_new_token(message: types.Message) -> None:
     """Set new token for User.
 
@@ -42,7 +42,7 @@ def set_new_token(message: types.Message) -> None:
 
 
 @bot.message_handler(commands=["my_token"])
-@logger_decorator
+@logger
 def my_token(message: types.Message) -> None:
     """Tell User their token.
 
@@ -51,14 +51,12 @@ def my_token(message: types.Message) -> None:
 
     """
     user_token = DBTokensHandler.get_me(message)
-    if user_token:
-        bot.send_message(message.from_user.id, messages.MY_TOKEN_MSG(user_token))
-    else:
-        bot.send_message(message.from_user.id, messages.MY_TOKEN_NOT_FOUND_MSG)
+    msg = messages.MY_TOKEN_MSG(user_token) if user_token else messages.MY_TOKEN_NOT_FOUND_MSG
+    bot.send_message(message.from_user.id, msg)
 
 
 @bot.message_handler(commands=["set_recipient"])
-@logger_decorator
+@logger
 def set_recipient(message: types.Message) -> None:
     """Send new Recipient's token request to User.
 
@@ -73,7 +71,7 @@ def set_recipient(message: types.Message) -> None:
 
 @bot.message_handler(func=lambda message: message.reply_to_message\
                                           and message.reply_to_message.text == messages.SET_RECIPIENT_MSG)
-@logger_decorator
+@logger
 def new_recipient(message: types.Message) -> None:
     """Set new Recipient's token from User's input.
 
@@ -86,7 +84,7 @@ def new_recipient(message: types.Message) -> None:
 
 
 @bot.message_handler(commands=["delete_recipient"])
-@logger_decorator
+@logger
 def delete_recipient(message: types.Message) -> None:
     """Set current Recipient's token to null.
 
@@ -99,7 +97,7 @@ def delete_recipient(message: types.Message) -> None:
 
 
 @bot.message_handler(commands=["get_recipient"])
-@logger_decorator
+@logger
 def get_recipient(message: types.Message) -> None:
     """Tell User current Recipient's token.
 
@@ -112,7 +110,7 @@ def get_recipient(message: types.Message) -> None:
 
 
 @bot.message_handler(commands=["random_recipient"])
-@logger_decorator
+@logger
 def random_recipient(message: types.Message) -> None:
     """Set a random Recipient from existing in the DB.
 
@@ -125,7 +123,7 @@ def random_recipient(message: types.Message) -> None:
 
 
 @bot.message_handler(func=lambda message: not message.reply_to_message)
-@logger_decorator
+@logger
 def send_message(message: types.Message) -> None:
     """Send anonymous text message to chosen Recipient. Tell User weather the message has been sent or not.
 
@@ -133,10 +131,9 @@ def send_message(message: types.Message) -> None:
         message: Text message from User.
 
     """
-    recipient_id = DBTokensHandler.get_recipient_id(message)
     recipient_token = DBTokensHandler.get_recipient(message)
     sender_token = DBTokensHandler.get_me(message)
-    if recipient_id:
+    if recipient_id := DBTokensHandler.get_recipient_id(message):
         bot.send_message(recipient_id, messages.INCOMING_MESSAGE_MSG(sender_token, message.text))
         bot.send_message(message.from_user.id, messages.MESSAGE_SENT_MSG(recipient_token))
     else:
@@ -144,7 +141,7 @@ def send_message(message: types.Message) -> None:
 
 
 def main():
-    logger.info("Bot is running.")
+    logger_obj.info("Bot is running.")
     bot.infinity_polling()
 
 
