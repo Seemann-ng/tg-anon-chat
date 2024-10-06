@@ -14,6 +14,9 @@ logger_obj = logging.getLogger("Telegraph Chat")
 def logger(func):
     @functools.wraps(func)
     def wrapper(message: types.Message, *args, **kwargs):
-        logger_obj.info(f"{func.__name__} called by user {message.from_user.username} with message {message.text}")
-        return func(message, *args, **kwargs)
+        logger_obj.info(f"{func.__name__} called by user {message.from_user.username} with message {message.text}.")
+        result = func(message, *args, **kwargs)
+        logger_obj.info(f"{func.__name__} executed successfully.")
+        return result
+
     return wrapper
