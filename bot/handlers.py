@@ -46,11 +46,7 @@ class DBTokensHandler:
         uid = message.from_user.id
         token = abs(hash(str(uid - message.id + message.date)))
         curs.execute("UPDATE users SET username = %s, user_token = %s WHERE user_id = %s",
-                     [
-                           message.from_user.username,
-                           token,
-                           uid
-                       ])
+                     (message.from_user.username, token, uid))
         return str(token)
 
     @staticmethod
@@ -69,16 +65,12 @@ class DBTokensHandler:
         uid = message.from_user.id
         token = abs(hash(str(uid - message.id + message.date)))
         curs.execute("INSERT INTO users (username, user_id, user_token) VALUES (%s, %s, %s)",
-                     [
-                           message.from_user.username,
-                           uid,
-                           token
-                       ])
+                     (message.from_user.username, uid, token))
         return str(token)
 
     @staticmethod
     @cursor
-    def get_me(message: types.Message, curs: psycopg2.extensions.cursor) -> str | None:
+    def get_me(message: types.Message, curs: psycopg2.extensions.cursor) -> str:
         """Get User token from the DB.
 
         Args:
@@ -86,13 +78,13 @@ class DBTokensHandler:
             curs: PostgreSQL cursor object.
 
         Returns:
-            User token if exists, None otherwise.
+            User token if exists, "" otherwise.
 
         """
         uid = message.from_user.id
-        curs.execute("SELECT user_token FROM users WHERE users.user_id = %s", [uid])
+        curs.execute("SELECT user_token FROM users WHERE users.user_id = %s", (uid, ))
         token = curs.fetchone()
-        return token[0] if token else None
+        return token[0] if token else ""
 
     @classmethod
     @cursor
@@ -111,15 +103,12 @@ class DBTokensHandler:
             cls.set_me(message)
         token = ''.join([symbol for symbol in message.text if symbol.isdigit()])
         curs.execute("UPDATE users SET current_recipient = %s WHERE user_id = %s",
-                     [
-                           token,
-                           message.from_user.id
-                       ])
+                     (token, message.from_user.id))
         return str(token)
 
     @classmethod
     @cursor
-    def set_random_recipient(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> str | None:
+    def set_random_recipient(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> str:
         """Set random Recipient token from existing tokens in the DB except User's one.
 
         Args:
@@ -127,26 +116,23 @@ class DBTokensHandler:
             curs: PostgreSQL cursor object.
 
         Returns:
-            New Recipient token if set, otherwise None.
+            New Recipient token if set, otherwise "".
 
         """
         if not cls.get_me(message):
             cls.set_me(message)
         curs.execute("SELECT user_token FROM users WHERE users.user_id != %s",
-                     [message.from_user.id])
+                     (message.from_user.id, ))
         if tokens := curs.fetchall():
             token = tokens[random.randint(0, len(tokens) - 1)]
             curs.execute("UPDATE users SET current_recipient = %s WHERE user_id = %s",
-                         [
-                               token,
-                               message.from_user.id
-                           ])
+                         (token, message.from_user.id))
             return str(token[0])
-        return None
+        return ""
 
     @classmethod
     @cursor
-    def get_recipient(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> str | None:
+    def get_recipient(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> str:
         """Get Recipient token from the DB.
 
         Args:
@@ -154,15 +140,15 @@ class DBTokensHandler:
             curs: PostgreSQL cursor object.
 
         Returns:
-            Recipient token if exists, None otherwise.
+            Recipient token if exists, "" otherwise.
 
         """
         if not cls.get_me(message):
             cls.set_me(message)
         uid = message.from_user.id
-        curs.execute("SELECT current_recipient FROM users WHERE user_id = %s", [uid])
+        curs.execute("SELECT current_recipient FROM users WHERE user_id = %s", (uid, ))
         recipient = curs.fetchone()
-        return recipient[0] if recipient else None
+        return recipient[0] if recipient else ""
 
     @classmethod
     @cursor
@@ -177,11 +163,11 @@ class DBTokensHandler:
         if not cls.get_me(message):
             cls.set_me(message)
         curs.execute("UPDATE users SET current_recipient = null WHERE user_id = %s",
-                     [message.from_user.id])
+                     (message.from_user.id, ))
 
     @classmethod
     @cursor
-    def get_recipient_id(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> int | None:
+    def get_recipient_id(cls, message: types.Message, curs: psycopg2.extensions.cursor) -> int:
         """Get Recipient ID form the DB.
 
         Args:
@@ -189,13 +175,13 @@ class DBTokensHandler:
             curs: PostgreSQL cursor object.
 
         Returns:
-            Recipient ID if found, None otherwise.
+            Recipient ID if found, 0 otherwise.
 
         """
         if not cls.get_me(message):
             cls.set_me(message)
-        if recipient := cls.get_recipient(message, ):
-            curs.execute("SELECT user_id FROM users WHERE user_token = %s", [recipient])
+        if recipient := cls.get_recipient(message):
+            curs.execute("SELECT user_id FROM users WHERE user_token = %s", (recipient, ))
             recipient_id = curs.fetchone()
-            return recipient_id[0] if recipient_id else None
-        return None
+            return recipient_id[0] if recipient_id else 0
+        return 0
