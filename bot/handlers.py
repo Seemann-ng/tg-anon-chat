@@ -1,4 +1,3 @@
-import functools
 import random
 
 import psycopg2
@@ -13,7 +12,6 @@ DB_PASSWORD = env.str("DB_PASSWORD")
 
 
 def cursor(func):
-    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         conn = psycopg2.connect(database="postgres",
                                 user=DB_USER,
